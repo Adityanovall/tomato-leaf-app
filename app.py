@@ -37,6 +37,13 @@ def preprocess_image(image):
     return image
 
 # ===============================
+# SOFTMAX FUNCTION (WAJIB)
+# ===============================
+def softmax(x):
+    exp_x = np.exp(x - np.max(x))
+    return exp_x / np.sum(exp_x)
+
+# ===============================
 # STREAMLIT UI
 # ===============================
 st.set_page_config(
@@ -67,9 +74,14 @@ if uploaded_file is not None:
     interpreter.invoke()
     inference_time = time.time() - start_time
 
-    output = interpreter.get_tensor(output_details[0]["index"])
-    prediction = np.argmax(output)
-    confidence = np.max(output)
+    # Ambil logits
+    logits = interpreter.get_tensor(output_details[0]["index"])[0]
+
+    # Softmax → probabilitas
+    probabilities = softmax(logits)
+
+    prediction = np.argmax(probabilities)
+    confidence = np.max(probabilities)
 
     # ===============================
     # OUTPUT
@@ -79,10 +91,12 @@ if uploaded_file is not None:
     st.write(f"**Confidence:** {confidence * 100:.2f}%")
     st.write(f"**Waktu Inferensi:** {inference_time:.4f} detik")
 
-    # Probability chart
+    # ===============================
+    # PROBABILITY CHART
+    # ===============================
     st.subheader("📊 Probabilitas Kelas")
     prob_dict = {
-        class_names[i]: float(output[0][i])
+        class_names[i]: float(probabilities[i])
         for i in range(len(class_names))
     }
     st.bar_chart(prob_dict)
