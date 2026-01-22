@@ -3,7 +3,6 @@ import numpy as np
 import tensorflow as tf
 from PIL import Image
 import time
-import cv2
 from tensorflow.keras.applications.mobilenet_v3 import preprocess_input
 
 # ===============================
@@ -81,40 +80,6 @@ def calculate_entropy(probabilities):
     probabilities = np.clip(probabilities, 1e-7, 1 - 1e-7)
     entropy = -np.sum(probabilities * np.log(probabilities))
     return entropy
-
-# ===============================
-# GREEN LEAF DETECTION
-# ===============================
-def detect_green_leaf(image):
-    """
-    Deteksi apakah gambar mengandung daun tomat (warna hijau)
-    Return: (is_valid, green_percentage)
-    - Menggunakan HSV color space untuk deteksi warna hijau
-    - Daun tomat umumnya memiliki warna hijau dengan saturation tinggi
-    """
-    # Convert PIL image ke numpy array
-    image_cv = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-    
-    # Convert ke HSV untuk deteksi warna yang lebih baik
-    hsv = cv2.cvtColor(image_cv, cv2.COLOR_BGR2HSV)
-    
-    # Range untuk warna hijau dalam HSV
-    # Green hue range: 35-90 (lebih luas untuk berbagai shade hijau)
-    lower_green = np.array([25, 40, 40])      # Lower bound: hue, saturation, value
-    upper_green = np.array([90, 255, 255])    # Upper bound
-    
-    # Create mask untuk warna hijau
-    mask = cv2.inRange(hsv, lower_green, upper_green)
-    
-    # Hitung persentase pixel hijau
-    green_pixels = cv2.countNonZero(mask)
-    total_pixels = image_cv.shape[0] * image_cv.shape[1]
-    green_percentage = green_pixels / total_pixels
-    
-    # Valid jika ada cukup pixel hijau
-    is_valid = green_percentage >= GREEN_DETECTION_THRESHOLD
-    
-    return is_valid, green_percentage
 
 # ===============================
 # STREAMLIT UI
