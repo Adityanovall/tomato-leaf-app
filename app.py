@@ -144,6 +144,5 @@ if uploaded_file is not None:
         }
         st.bar_chart(prob_dict)
     else:
-        st.warning(f"⚠️ Confidence terlalu rendah untuk prediksi yang reliable.")
-        st.info(f"Confidence: {confidence * 100:.2f}% (minimum: {CONFIDENCE_THRESHOLD * 100:.0f}%)")
-        st.info("💡 Silakan upload gambar lain.")
+        st.warning(f"⚠️ Gambar yang diupload sepertinya bukan daun tomat.")
+        st.info("💡  Silakan upload gambar daun tomat yang jelas.")
